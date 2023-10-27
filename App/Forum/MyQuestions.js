@@ -4,6 +4,7 @@ import { getDatabase, ref, onValue, remove, update } from 'firebase/database';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import app from '../firebaseConfig';
+import Header from '../Header';
 
 const MyQuestions = () => {
   const [questions, setQuestions] = useState([]);
@@ -113,6 +114,7 @@ const MyQuestions = () => {
   );
 
   return (
+    <><Header/>
     <View style={styles.container}>
       <FlatList
         data={questions}
@@ -183,6 +185,7 @@ const MyQuestions = () => {
         </Modal>
       )}
     </View>
+    </>
   );
 };
 

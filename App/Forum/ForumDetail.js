@@ -1,7 +1,13 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, Alert } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
+import Header from '../Header';
+
+import app from '../firebaseConfig'; // Import the Firebase app instance
+import { getDatabase, ref, push, onValue } from 'firebase/database';
+
+const db = getDatabase(app);
 
 const ForumDetails = ({ route }) => {
   const { question } = route.params;
@@ -15,6 +21,8 @@ const ForumDetails = ({ route }) => {
   const [dislikeClicked, setDislikeClicked] = useState(false);
 
   const [comments, setComments] = useState([]);
+
+  //const [count, setCount] = useState([]);
 
   const handleLike = () => {
     if (!likeClicked) {
@@ -44,14 +52,40 @@ const ForumDetails = ({ route }) => {
     setShowCommentModal(false);
   };
 
+  // const saveCount = () => {
+  //   const count = 
+  // }
+
+  // const handleCommentSubmit = () => {
+  //   const comment = commentInputRef.current.value;
+  //   setComments([...comments, comment]);
+  //   setCommentCount(commentCount + 1);
+  //   setShowCommentModal(false);
+  // };
+
   const handleCommentSubmit = () => {
     const comment = commentInputRef.current.value;
-    setComments([...comments, comment]);
+    // Save comment to Firebase Realtime Database
+    const dbRef = ref(db, `comments/${question.id}`);
+    push(dbRef, comment);
     setCommentCount(commentCount + 1);
     setShowCommentModal(false);
   };
 
+  useEffect(() => {
+    // Retrieve comments from Firebase Realtime Database
+    const dbRef = ref(db, `comments/${question.id}`);
+    onValue(dbRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const commentList = Object.values(data);
+        setComments(commentList);
+      }
+    });
+  }, [question.id]);
+
   return (
+    <><Header/>
     <View style={styles.container}>
       <Text style={styles.title}>{question.title}</Text>
       <View style={styles.box}>
@@ -78,7 +112,19 @@ const ForumDetails = ({ route }) => {
             <Text style={styles.buttonIcons}>{commentCount}</Text>
           </TouchableOpacity>
         </View>
+
+        <View style={styles.commentsContainer}>
+            {comments.map((comment, index) => (
+              <Text key={index} style={styles.comment}>
+                {comment}
+              </Text>
+            ))}
+          </View>
+
+        
       </View>
+
+      
 
       <Modal visible={showCommentModal} transparent animationType="slide">
         <View style={styles.modalContainer}>
@@ -98,7 +144,13 @@ const ForumDetails = ({ route }) => {
           </View>
         </View>
       </Modal>
+
+      {/* <TouchableOpacity style={styles.submitButton} onPress={saveCount}>
+              <Text style={styles.buttonText}>SUBMIT</Text>
+      </TouchableOpacity> */}
+
     </View>
+    </>
   );
 };
 
@@ -186,10 +238,22 @@ const styles = StyleSheet.create({
   space: {
     width: 20,
   },
+  // comment: {
+  //   fontSize: 16,
+  //   marginTop: 10,
+  // },
   comment: {
     fontSize: 16,
     marginTop: 10,
+    backgroundColor: 'lightgrey',
+    padding: 10,
+    borderRadius: 5,
   },
+  commentsContainer: {
+    marginTop: 20,
+    width: '100%',
+  },
+  
 });
 
 export default ForumDetails;

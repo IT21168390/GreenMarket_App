@@ -98,9 +98,17 @@ const ForumList = ({ navigation }) => {
         
       </View> */}
 
-      <View style={styles.timeAgoBox}>
-        <Text style={styles.timeAgoText}>{item.timeAgo} minutes ago</Text>
-      </View>
+    <View style={styles.timeAgoBox}>
+      <Text style={styles.timeAgoText}>
+        {item.timeAgo < 60
+          ? `${item.timeAgo} minutes ago`
+          : item.timeAgo < 1440
+          ? `${Math.floor(item.timeAgo / 60)} hours ago`
+          : `${Math.floor(item.timeAgo / 1440)} days ago`}
+      </Text>
+    </View>
+
+
     </TouchableOpacity>
   );
 

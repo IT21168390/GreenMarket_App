@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import { getDatabase, ref, push, set, serverTimestamp } from 'firebase/database';
 import app from '../firebaseConfig';
+import Header from '../Header';
 
 const ForumPost = ({ navigation }) => {
   const [title, setTitle] = useState('');
@@ -40,6 +41,9 @@ const ForumPost = ({ navigation }) => {
       title: title,
       question: question,
       timestamp: serverTimestamp(), // Add the timestamp here
+      like: 0,
+      dislike: 0,
+      
     });
 
     // Clear the fields after posting
@@ -57,6 +61,7 @@ const ForumPost = ({ navigation }) => {
   };
 
   return (
+    <><Header/>
     <View style={styles.container}>
       <ImageBackground
         source={require('../../assets/background.avif')} // Change the path to your image
@@ -99,6 +104,7 @@ const ForumPost = ({ navigation }) => {
         </View>
       </ImageBackground>
     </View>
+    </>
   );
 };
 

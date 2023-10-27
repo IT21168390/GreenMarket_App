@@ -7,8 +7,8 @@ import { app, firebase } from '../../Firebase/FirebaseConfig';
 import Header from '../../SharedComponents/Header';
 
 const BarterAvailableOptions = ({ passedData }) => {
-    /*const expectedPostId = useRoute(passedData).params.postId;
-    const expectedCategory = useRoute(passedData).params.category;*/
+    /*const expectedPostId = useRoute(passedData).params.postId;*/
+    const expectedCategory = useRoute(passedData).params.category;
     const expectedPostType = useRoute(passedData).params.type;
     const expectedDistrict = useRoute(passedData).params.district;
 
@@ -56,7 +56,8 @@ const BarterAvailableOptions = ({ passedData }) => {
     const filteredPosts = availableOptions.filter(post => {
         const locationMatch = post.district === expectedDistrict;
         const userUnmatch = post.userId !== userId;
-        const categoryMatch = expectedPostType === "Let's exchange " ? post.postType === expectedPostType : post.postType !== expectedPostType;
+        //const categoryMatch = expectedPostType === "Let's exchange " ? post.postType === expectedPostType : post.postType !== expectedPostType;
+        const categoryMatch = expectedPostType === "Let's exchange " ? post.postType === expectedPostType : expectedPostType === 'I need ' ? post.postType === 'I can give ' && post.category === expectedCategory : post.postType !== expectedPostType;
 
         return userUnmatch && locationMatch && categoryMatch;
     });
@@ -81,7 +82,7 @@ const BarterAvailableOptions = ({ passedData }) => {
         <View>
             <Header />
             <Text style={{ fontSize: 19, textAlign: 'center', fontWeight: 'bold', marginTop: 15 }}>BARTER EXCHANGE - Available Options</Text>
-            <Text style={{ fontSize: 14, marginTop: 5, textAlign: 'center', color: 'black', backgroundColor: 'lightyellow', marginHorizontal: 120, borderRadius: 20}}>in {expectedDistrict} district</Text>
+            <Text style={{ fontSize: 14, marginTop: 5, textAlign: 'center', color: 'black', backgroundColor: 'lightyellow', marginHorizontal: 120, borderRadius: 20 }}>in {expectedDistrict} district</Text>
             <ScrollView>
                 {filteredPosts ?
                     (filteredPosts.map((post, index) => {

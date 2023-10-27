@@ -43,11 +43,11 @@ const PostItem = ({ post, onViewDetails, onMakeOffer }) => {
               <View style={styles.postedRow}>
                 <View>
                   <Text style={styles.postedLabel}>Posted by (Farmer):</Text>
-                  <Text style={styles.postedLabel}>Phone number:</Text>
+                  <Text style={styles.postedLabel}>From:</Text>
                 </View>
                 <View style={styles.postedValueContainer}>
                   <Text style={styles.postedValue}>{post.userLog.firstName} {post.userLog.lastName}</Text>
-                  <Text style={styles.postedValue}>{post.userLog.phoneNumber}</Text>
+                  <Text style={styles.postedValue}>{post.userLog.district}</Text>
                 </View>
               </View>
             </View>

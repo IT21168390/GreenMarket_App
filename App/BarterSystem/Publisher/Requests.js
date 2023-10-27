@@ -818,6 +818,7 @@ const Requests = () => {
               style={styles.input}
               placeholder="Quantity"
               value={updatedQuantity}
+              keyboardType="numeric"
               onChangeText={(text) => setUpdatedQuantity(text)}
             />
             <Text style={styles.labelStyle}>Unit :</Text>
@@ -965,7 +966,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: screenWidth * 0.225,
   },
   updateButton: {
-    backgroundColor: 'red',
+    backgroundColor: '#f55f45',
     padding: 8,
     borderRadius: 5,
 

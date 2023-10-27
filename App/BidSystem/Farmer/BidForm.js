@@ -225,14 +225,16 @@ export default function PostNewRequest() {
             userId, // The ID of the logged-in user
             userLog, // User's data
             image: imageURL, // Include the selected image URI
-            timestamp
+            status: 'open',
+            timestamp,
+            bidData: 'Null'
         };
 
-        // Get a reference to the 'BarterRequests' database location
-        const barterRequestsRef = databaseRef(database, 'bids');
+        // Get a reference to the 'BidRequests' database location
+        const bidRequestsRef = databaseRef(database, 'bids');
 
         // Push the new request data to the database
-        push(barterRequestsRef)
+        push(bidRequestsRef)
             .then((newRequestRef) => {
                 // Now, set the data for the new request under the generated key
                 set(newRequestRef, newRequest)
@@ -313,7 +315,7 @@ export default function PostNewRequest() {
       </Picker> */}
 
                     {/* Time Dropdown */}
-                    <Picker
+                    {/* <Picker
                         style={styles.dropdown}
                         selectedValue={time}
                         onValueChange={itemValue => setTime(itemValue)}>
@@ -321,7 +323,7 @@ export default function PostNewRequest() {
                         {times.map((time, index) => (
                             <Picker.Item key={index} label={time} value={time} />
                         ))}
-                    </Picker>
+                    </Picker> */}
 
                     <TextInput
                         style={styles.input}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity, Dimensions, Modal, ScrollView, TextInput } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
@@ -11,7 +11,7 @@ import { getDownloadURL, ref as storageRef, uploadString } from 'firebase/storag
 import { getStorage, uploadBytes } from "firebase/storage";
 import { app, firebase } from '../../Firebase/firebaseConfig';
 
-const units = ['kg', 'g', 'L', 'ml', 'units', 'other'];
+
 
 const DisplayBids = ({ navigation }) => {
   const [userId, setUserId] = useState(null);
@@ -35,9 +35,6 @@ const DisplayBids = ({ navigation }) => {
   const [updatedDescription, setUpdatedDescription] = useState('');
   const [updatedImage, setUpdatedImage] = useState(null);
   const [currentPrice, setCurrentPrice] = useState();
-  const [updatedStatus, setUpdatedStatus] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-const [selectedUnit, setSelectedUnit] = useState('');
 
 
   async function fetchLoggedInUserID() {
@@ -65,7 +62,11 @@ const [selectedUnit, setSelectedUnit] = useState('');
           console.log(data);
 
 
-          const requests = Object.keys(data).map((id) => ({
+          const requests = Object.keys(data)
+          .filter((id) => data[id].status === 'complete')
+          .filter((id) => data[id].bidData.userId === userId)
+          .filter((id) => data[id].bidData.price !== undefined)
+          .map((id) => ({
             id: id, // Assign the key (id) to the variable id
             image: data[id].image, // Assuming the image URL is in the `image` field
             category: data[id].category,
@@ -85,9 +86,14 @@ const [selectedUnit, setSelectedUnit] = useState('');
             userLog: data[id].userLog,
             timestamp: data[id].timestamp,
             userId: data[id].userId,
-            status: data[id].status,
             price: data[id].bidData.price,
+            username: data[id].bidData.username,
+            status:  data[id].status,
           }));
+          const itemId = '-Nhe5Kcw_A92o4UFUlfP';
+          // const price = data[itemId].bidData.price;
+          // const status = data[itemId].status;
+          //  console.log(data + status);
           setRequests(requests);
         } else {
           console.log("No data available");
@@ -156,14 +162,12 @@ const [selectedUnit, setSelectedUnit] = useState('');
       }
 
     }
-
-    userBidRequests();
   };
 
 
 
   const handleImageUpload = async () => {
-
+   
     // You can use the ImagePicker to select a new image and update updatedImage state with the new URL
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -202,32 +206,10 @@ const [selectedUnit, setSelectedUnit] = useState('');
       .catch((error) => {
         console.error('Error deleting item post:', error);
       });
-
   };
 
 
 
-  const handleCompleteRequest = async () => {
-    console.log(selectedRequest)
-
-    if (selectedRequest) {
-      const updatedRequestData = {
-        status: 'complete',
-
-      };
-
-      const requestRef = databaseRef(database, `bids/${selectedRequest.id}`);
-      // set(requestRef, updatedRequestData)
-      try {
-        await update(requestRef, updatedRequestData).then(() => {
-          console.log('Request updated successfully!');
-        })
-      } catch (error) {
-        console.error('Error updating request:', error);
-      }
-
-    }
-  };
 
   useEffect(() => {
 
@@ -241,73 +223,37 @@ const [selectedUnit, setSelectedUnit] = useState('');
         userBidRequests();
       }
     }, [userId])
-  );
-
-
-
+  );  
 
   const renderItem = ({ item }) => (
     <View style={styles.requestItem}>
-
-
+     
       <View>
         <View style={styles.bidContainer}>
           <Image source={{ uri: item.image }} style={styles.image} />
           <View style={styles.productInfo}>
             <Text style={styles.productName}>{item.productName}</Text>
             <Text>Quantity: {item.quantity}</Text>
-            <Text>Status : {item.status}</Text>
-            <Text>Initial Price : {item.initialPrice}.00 LKR</Text>
+            <Text>You won the bid!</Text>
+            <Text>Seller : {item.userLog.username}</Text>
           </View>
           <View style={styles.priceContainer}>
-            <Text style={styles.initialPrice}>{item.currentPrice}.00 LKR</Text>
+            <Text style={styles.initialPrice}>{item.price}.00 LKR</Text>
           </View>
 
         </View>
-        {item.status !== 'complete'  && (
-          <>
-          <View>
-            <View style={styles.buttonsContainer}>
-              <TouchableOpacity style={styles.deleteButton} onPress={() => deleteRequest(item.id)}>
-                <Text style={styles.buttonText}>Close</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.updateButton}
-                onPress={() => {
-                  setSelectedRequest(item);
-                  setUpdateModalVisible(true);
-                  // Set initial values for update modal
-                  setUpdatedCategory(item.category);
-                  // setUpdatedDistrict(item.initialPrice);
-                  setUpdatedQuantity(item.quantity);
-                  setUpdatedUnit(item.unit);
-                  setUpdatedTitle(item.productName);
-                  setUpdatedDescription(item.description);
-                  setCurrentPrice(item.currentPrice);
-                }}>
-                <Text style={styles.buttonText}>Update</Text>
-              </TouchableOpacity>
-              </View>
-              {item.price !== undefined  && (
-              <TouchableOpacity style={styles.completeButton}
-                onPress={() => {
-                  setSelectedRequest(item);
-                  handleCompleteRequest();
-                }}>
-                <Text style={styles.buttonTextComplete}>Mark as Completed</Text>
-              </TouchableOpacity>
-              )}
-            </View>
-          </>
-        )}
-        {item.status === 'complete' && (
-          <TouchableOpacity style={styles.viewButton} onPress={() => navigation.navigate('ViewHighestBid')}>
-            <Text style={styles.buttonTextView}>View</Text>
+        <View style={styles}>
+          {/* <TouchableOpacity style={styles.deleteButton} onPress={() => deleteRequest(item.id)}>
+            <Text style={styles.buttonText}>Delete</Text>
+          </TouchableOpacity> */}
+          <TouchableOpacity style={styles.updateButton}
+            onPress={() => {
+             }}>
+            <Text style={styles.buttonText}>Contact</Text>
           </TouchableOpacity>
-        )}
+        </View>
       </View>
       {/* ////////////////////////////// */}
-
     </View>
   );
 
@@ -320,6 +266,34 @@ const [selectedUnit, setSelectedUnit] = useState('');
       // Calculate the number of days ago the post was published
       const daysAgo = Math.floor((Date.now() - selectedRequest.timestamp) / (1000 * 60 * 60 * 24));
 
+      return (
+        <Modal visible={modalVisible} animationType="slide">
+          <View style={styles.modalContainer}>
+            <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>{selectedRequest.title}</Text>
+              <Image source={{ uri: selectedRequest.image }} style={styles.modalImage} />
+              <View style={styles.modalTag}>
+                <Text style={styles.modalTagText}>Category: </Text>
+                <Text style={styles.modalValueTextCategory}>{selectedRequest.category}</Text>
+              </View>
+              <Text style={styles.modalLabel}>Quantity: {selectedRequest.quantitySum}</Text>
+              <View style={styles.postedViewData}>
+                <Text style={styles.modalLabel}>Description:</Text>
+                <Text style={styles.modalDescription}>{selectedRequest.description}</Text>
+                <View style={styles.modalTag}>
+                  <Text style={styles.modalTagText}>Target District: </Text>
+                  <Text style={styles.modalValueText}>{selectedRequest.initialPrice}</Text>
+                </View>
+              </View>
+              <Text style={styles.modalTimestamp}>{`${daysAgo} days ago`}</Text>
+              {/* You can add more details here */}
+            </View>
+          </View>
+        </Modal>
+      );
     }
   };
 
@@ -392,22 +366,12 @@ const [selectedUnit, setSelectedUnit] = useState('');
               value={updatedTitle}
               onChangeText={(text) => setUpdatedTitle(text)}
             />
-            {/* <TextInput
+            <TextInput
               style={styles.input}
               placeholder="Category"
               value={updatedCategory}
               onChangeText={(text) => setUpdatedCategory(text)}
-            /> */}
-             <Picker
-              selectedValue={updatedCategory}
-              onValueChange={(itemValue) => setUpdatedCategory(itemValue)}
-              style={styles.picker}
-            >
-                        <Picker.Item label="Select Category" value="" />
-                        <Picker.Item label="Spices" value="Spices" />
-                        <Picker.Item label="Others" value="Others" />
-              {/* Add more categories as needed */}
-            </Picker>
+            />
             {/* <TextInput
               style={styles.input}
               placeholder="District"
@@ -420,22 +384,12 @@ const [selectedUnit, setSelectedUnit] = useState('');
               value={updatedQuantity}
               onChangeText={(text) => setUpdatedQuantity(text)}
             />
-            {/* <TextInput
+            <TextInput
               style={styles.input}
               placeholder="Unit"
               value={updatedUnit}
               onChangeText={(text) => setUpdatedUnit(text)}
-            /> */}
-            <Picker
-              selectedValue={updatedUnit}
-              onValueChange={(itemValue) => setUpdatedUnit(itemValue)}
-              style={styles.picker}
-            >
-                       {units.map((unit, index) => (
-                                <Picker.Item key={index} label={unit.length > 10 ? unit.substring(0, 10) + '...' : unit} value={unit} />
-                            ))}
-              {/* Add more categories as needed */}
-            </Picker>
+            />
             <TextInput
               style={styles.input}
               placeholder="Description"
@@ -498,7 +452,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   viewButton: {
-    backgroundColor: '#e4eba4',
+    backgroundColor: '#3AB918',
     //padding: 10,
     borderRadius: 5,
     //marginRight: 5,
@@ -559,24 +513,16 @@ const styles = StyleSheet.create({
 
     paddingHorizontal: screenWidth * 0.225,
   },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    //fontSize: 15,
-  },
 
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    margin: 'auto'
   },
   modalContent: {
     backgroundColor: 'white',
     padding: 16,
-    paddingBottom: 20,
     borderRadius: 10,
     width: '80%',
   },
@@ -769,18 +715,11 @@ const styles = StyleSheet.create({
     right: 0,
   },
   updateButton: {
-    backgroundColor: '#497db8',
+    backgroundColor: 'green',
     padding: 8,
     borderRadius: 10,
     paddingLeft: 30,
-    marginLeft: 20,
-    paddingRight: 30,
-  },
-  completeButton: {
-    backgroundColor: '#49adb8',
-    padding: 8,
-    borderRadius: 10,
-    paddingLeft: 30,
+    // marginLeft: 20,
     paddingRight: 30,
   },
   deleteButton: {
@@ -793,25 +732,8 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 16,
-  },
-  buttonTextView: {
-    color: '#000',
-    fontSize: 16,
     textAlign: 'center'
   },
-  buttonTextComplete: {
-    color: '#fff',
-    fontSize: 16,
-    textAlign: 'center'
-  },
-  picker: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 5,
-    marginBottom: 5,
-  },
-
 });
 
 export default DisplayBids;

@@ -456,6 +456,13 @@ export default function PostNewRequest() {
     const [isModalVisible, setModalVisible] = useState(false);
     const [isFormValid, setIsFormValid] = useState(false);
 
+    // Error states for each field
+    const [postTitleError, setPostTitleError] = useState('');
+    const [categoryError, setCategoryError] = useState('');
+    const [descriptionError, setDescriptionError] = useState('');
+    const [quantityError, setQuantityError] = useState('');
+    const [districtError, setDistrictError] = useState('');
+
     const districts = [
         'Galle',
         'Matara',
@@ -533,7 +540,7 @@ export default function PostNewRequest() {
             imageURL !== null;
 
         setIsFormValid(isValid);
-    }, [userId, postTitle, category, description, imageURL, district]);
+    }, [userId, postTitle, category, description, imageURL, district, postTitleError, categoryError, descriptionError, quantityError, districtError]);
 
     useFocusEffect(
         useCallback(() => {
@@ -622,7 +629,67 @@ export default function PostNewRequest() {
         }
     };
 
+
+    const validatePostTitle = () => {
+        if (!postTitle) {
+            setPostTitleError('Post title is required');
+        } else {
+            setPostTitleError('');
+        }
+    };
+    const validateCategory = () => {
+        if (!category) {
+            setCategoryError('Post category is required');
+        } else {
+            setCategoryError('');
+        }
+    };
+    const validateDescription = () => {
+        if (!description) {
+            setDescriptionError('Post description is required');
+        } else {
+            setDescriptionError('');
+        }
+    };
+    const validateQuantity = () => {
+        if (!quantity) {
+            setQuantityError('Post quantity is required');
+        } else {
+            setQuantityError('');
+        }
+    };
+    const validateDistrict = () => {
+        if (!description) {
+            setDistrictError('Post district is required');
+        } else {
+            setDistrictError('');
+        }
+    };
+
     const handlePost = () => {
+        // Validate all fields
+        validatePostTitle();
+        validateCategory();
+        validateDescription();
+        validateQuantity();
+        validateDistrict();
+        // Check if any error exists
+        if (
+            postTitleError ||
+            categoryError ||
+            descriptionError ||
+            quantityError ||
+            districtError
+        ) {
+            // Display an error message or prevent form submission
+            return;
+        }
+
+        if (!isFormValid) {
+            alert("Please upload an image...");
+            return;
+        }
+
         // Create a new request object with the form data and user's data
         const newRequest = {
             postType,
@@ -652,6 +719,12 @@ export default function PostNewRequest() {
                         showSuccessModal();
                         setImage(null);
                         setImageURL(null);
+
+                        setDescription('');
+                        setQuantity('');
+                        setCategory('');
+                        setPostTitle('');
+                        setDistrict('');
                     })
                     .catch((error) => {
                         console.error('Error setting request data:', error);
@@ -663,131 +736,148 @@ export default function PostNewRequest() {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-                <Text style={styles.heading}>Post New Request</Text>
+        <ScrollView>
+            {/* <ScrollView contentContainerStyle={styles.container}> */}
+            <View style={styles.container}>
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    style={{ flex: 1 }}
+                >
+                    <Text style={styles.heading}>Post New Request</Text>
 
-                <View style={styles.postTypeContainer}>
-                    {/* Post Type Selection */}
-                    <TouchableOpacity
-                        style={[
-                            styles.postTypeButton,
-                            postType === 'I need ' && styles.postTypeSelected,
-                        ]}
-                        onPress={() => setPostType('I need ')}>
-                        <Text style={styles.postTypeButtonText}>I need...</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[
-                            styles.postTypeButton,
-                            postType === 'I can give ' && styles.postTypeSelected,
-                        ]}
-                        onPress={() => setPostType('I can give ')}>
-                        <Text style={styles.postTypeButtonText}>I can give...</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[
-                            styles.postTypeButton,
-                            postType === "Let's exchange " && styles.postTypeSelected,
-                        ]}
-                        onPress={() => setPostType("Let's exchange ")}>
-                        <Text style={styles.postTypeButtonText}>Exchange</Text>
-                    </TouchableOpacity>
-                </View>
+                    <View style={styles.postTypeContainer}>
+                        {/* Post Type Selection */}
+                        <TouchableOpacity
+                            style={[
+                                styles.postTypeButton,
+                                postType === 'I need ' && styles.postTypeSelected,
+                            ]}
+                            onPress={() => setPostType('I need ')}>
+                            <Text style={styles.postTypeButtonText}>I need...</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[
+                                styles.postTypeButton,
+                                postType === 'I can give ' && styles.postTypeSelected,
+                            ]}
+                            onPress={() => setPostType('I can give ')}>
+                            <Text style={styles.postTypeButtonText}>I can give...</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[
+                                styles.postTypeButton,
+                                postType === "Let's exchange " && styles.postTypeSelected,
+                            ]}
+                            onPress={() => setPostType("Let's exchange ")}>
+                            <Text style={styles.postTypeButtonText}>Exchange</Text>
+                        </TouchableOpacity>
+                    </View>
 
-                <TextInput
-                    style={styles.inputTopic}
-                    placeholder="Post Title"
-                    value={postTitle}
-                    onChangeText={text => setPostTitle(text)}
-                />
-
-                {/* Category Dropdown */}
-                <Picker
-                    style={styles.dropdown}
-                    selectedValue={category}
-                    onValueChange={itemValue => setCategory(itemValue)}>
-                    <Picker.Item label="Select Category" value="" />
-                    {categories.map((category, index) => (
-                        <Picker.Item key={index} label={category} value={category} />
-                    ))}
-                </Picker>
-
-                <TextInput
-                    style={styles.largeInput} // Make the description input larger
-                    placeholder="Description"
-                    multiline={true}
-                    numberOfLines={6} // Adjust the number of lines
-                    value={description}
-                    onChangeText={text => setDescription(text)}
-                />
-
-                <View style={styles.quantityContainer}>
+                    <Text style={{ color: 'red' }}>{postTitleError}</Text>
                     <TextInput
-                        style={styles.inputQuantity}
-                        placeholder="Quantity"
-                        value={quantity}
-                        keyboardType="numeric"
-                        onChangeText={text => setQuantity(text)}
+                        style={styles.inputTopic}
+                        placeholder="Post Title"
+                        value={postTitle}
+                        onChangeText={text => { setPostTitle(text); validatePostTitle(); }}
                     />
+
+                    <Text style={{ color: 'red' }}>{categoryError}</Text>
+                    {/* Category Dropdown */}
                     <Picker
-                        style={styles.unitPicker}
-                        selectedValue={unit}
-                        onValueChange={itemValue => setUnit(itemValue)}>
-                        {units.map((unit, index) => (
-                            <Picker.Item key={index} label={unit.length > 10 ? unit.substring(0, 10) + '...' : unit} value={unit} />
+                        style={styles.dropdown}
+                        selectedValue={category}
+                        onValueChange={itemValue => { setCategory(itemValue); validateCategory() }}>
+                        <Picker.Item label="Select Category" value="" />
+                        {categories.map((category, index) => (
+                            <Picker.Item key={index} label={category} value={category} />
                         ))}
                     </Picker>
-                </View>
 
-                {/* District Dropdown */}
-                <Picker
-                    style={styles.dropdown}
-                    selectedValue={district}
-                    onValueChange={itemValue => setDistrict(itemValue)}>
-                    <Picker.Item label="Select District" value="" />
-                    {districts.map((district, index) => (
-                        <Picker.Item key={index} label={district} value={district} />
-                    ))}
-                </Picker>
+                    <Text style={{ color: 'red' }}>{descriptionError}</Text>
+                    <TextInput
+                        style={styles.largeInput} // Make the description input larger
+                        placeholder="Description"
+                        multiline={true}
+                        numberOfLines={5} // Adjust the number of lines
+                        value={description}
+                        onChangeText={text => { setDescription(text); validateDescription() }}
+                    />
 
-                {/* Image Upload */}
-                <View style={styles.imageUploadContainer}>
+                    <Text style={{ color: 'red' }}>{quantityError}</Text>
+                    <View style={styles.quantityContainer}>
+                        <TextInput
+                            style={styles.inputQuantity}
+                            placeholder="Quantity"
+                            value={quantity}
+                            keyboardType="numeric"
+                            onChangeText={text => { setQuantity(text); validateQuantity() }}
+                        />
+                        <Picker
+                            style={styles.unitPicker}
+                            selectedValue={unit}
+                            onValueChange={itemValue => setUnit(itemValue)}>
+                            {units.map((unit, index) => (
+                                <Picker.Item key={index} label={unit.length > 10 ? unit.substring(0, 10) + '...' : unit} value={unit} />
+                            ))}
+                        </Picker>
+                    </View>
+
+                    <Text style={{ color: 'red' }}>{districtError}</Text>
+                    {/* District Dropdown */}
+                    <Picker
+                        style={styles.dropdown}
+                        selectedValue={district}
+                        onValueChange={itemValue => { setDistrict(itemValue); validateDistrict() }}>
+                        <Picker.Item label="Select District" value="" />
+                        {districts.map((district, index) => (
+                            <Picker.Item key={index} label={district} value={district} />
+                        ))}
+                    </Picker>
+
+                    {/* Image Upload */}
+                    <View style={styles.imageUploadContainer}>
+                        <TouchableOpacity
+                            style={styles.uploadButton}
+                            onPress={handleImageUpload}>
+                            <Text style={styles.uploadButtonText}>Upload Image</Text>
+                        </TouchableOpacity>
+                        {image && <Image source={{ uri: image }} style={styles.image} />}
+                    </View>
+
+                    {/* Add spacing between the buttons */}
+                    <View style={styles.buttonSpacing} />
+
+                    {/* Custom Button */}
                     <TouchableOpacity
-                        style={styles.uploadButton}
-                        onPress={handleImageUpload}>
-                        <Text style={styles.uploadButtonText}>Upload Image</Text>
+                        style={styles.customButton}
+                        onPress={handlePost}>
+                        <Text style={styles.customButtonText}>POST</Text>
                     </TouchableOpacity>
-                    {image && <Image source={{ uri: image }} style={styles.image} />}
-                </View>
-
-                {/* Add spacing between the buttons */}
-                <View style={styles.buttonSpacing} />
-                {/* Custom Button */}
-                <TouchableOpacity
+                    {/* <TouchableOpacity
                     style={styles.customButton}
                     onPress={handlePost}
                     disabled={!isFormValid}>
-                    <Text style={styles.customButtonText}>Post</Text>
-                </TouchableOpacity>
+                    <Text style={styles.customButtonText}>POST</Text>
+                </TouchableOpacity> */}
 
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={isModalVisible}
-                    onRequestClose={() => setModalVisible(false)}
-                >
-                    <View style={styles.centeredView}>
-                        <View style={styles.modalView}>
-                            <Text style={{ fontSize: 18 }}>Post successfully published!</Text>
-                            <TouchableOpacity style={{ marginTop: 50 }} onPress={() => setModalVisible(false)}>
-                                <Text style={styles.modalViewButton}>OK</Text>
-                            </TouchableOpacity>
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={isModalVisible}
+                        onRequestClose={() => setModalVisible(false)}
+                    >
+                        <View style={styles.centeredView}>
+                            <View style={styles.modalView}>
+                                <Text style={{ fontSize: 18 }}>Post successfully published!</Text>
+                                <TouchableOpacity style={{ marginTop: 50 }} onPress={() => setModalVisible(false)}>
+                                    <Text style={styles.modalViewButton}>OK</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    </View>
-                </Modal>
+                    </Modal>
 
-            </KeyboardAvoidingView>
+                </KeyboardAvoidingView>
+            </View>
         </ScrollView>
     );
 }
@@ -797,6 +887,13 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
         backgroundColor: Colors.background,
+
+        borderWidth: 2.5,
+        marginVertical: 8,
+        marginHorizontal: 8,
+        borderColor: 'black',
+
+        //marginBottom: 25
     },
     heading: {
         fontSize: 24,
@@ -831,8 +928,8 @@ const styles = StyleSheet.create({
         height: 40,
         //borderColor: Colors.primary,
         borderColor: 'black',
-        borderWidth: 3,
-        borderRadius: 8,
+        borderWidth: 2,
+        borderRadius: 5,
         marginBottom: 16,
         paddingHorizontal: 12,
         fontWeight: 'bold',
@@ -858,8 +955,8 @@ const styles = StyleSheet.create({
         height: 40,
         //borderColor: Colors.primary,
         borderColor: 'black',
-        borderWidth: 3,
-        borderRadius: 8,
+        borderWidth: 2,
+        borderRadius: 5,
         paddingHorizontal: 12,
         fontSize: 18,
     },
@@ -876,8 +973,8 @@ const styles = StyleSheet.create({
         height: 120, // Increased height for larger description input
         //borderColor: Colors.primary,
         borderColor: 'black',
-        borderWidth: 3,
-        borderRadius: 8,
+        borderWidth: 2,
+        borderRadius: 5,
         marginBottom: 16,
         paddingHorizontal: 12,
         fontSize: 20,
@@ -899,6 +996,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         backgroundColor: 'white', // Background color
         color: 'black', // Text color
+
     },
     imageUploadContainer: {
         flexDirection: 'row',
@@ -907,15 +1005,16 @@ const styles = StyleSheet.create({
         marginBottom: 5,
     },
     uploadButton: {
-        backgroundColor: '#ffae00',
-        padding: 10,
-        borderRadius: 8,
+        backgroundColor: '#e6b947',//'#ffae00',
+        padding: 8,
+        borderRadius: 5,
         alignItems: 'center',
         flex: 1,
     },
     uploadButtonText: {
-        color: 'white',
+        color: 'black',//'black',
         fontWeight: '700',
+        fontSize: 16,
     },
     image: {
         width: 75,
@@ -929,15 +1028,17 @@ const styles = StyleSheet.create({
         marginBottom: 16, // Add spacing between the buttons
     },
     customButton: {
-        backgroundColor: Colors.postButton,
-        borderRadius: 10,
+        backgroundColor: '#4b5ebf', //Colors.postButton,
+        borderRadius: 20,
         height: 60,
         justifyContent: 'center',
         alignItems: 'center',
         //marginTop: 'auto'
+
+        marginBottom: 30
     },
     customButtonText: {
-        color: 'white',
+        color: 'white',//'white',
         fontSize: 30,
         fontWeight: 'bold',
     },

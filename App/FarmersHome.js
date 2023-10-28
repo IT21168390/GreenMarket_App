@@ -30,7 +30,7 @@ const FarmersHome = () => {
                     <Text style={styles.buttonText}>Barter System</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('DisplayBids')}>
                     <Image source={require('../assets/Picture1.png')} style={styles.buttonIcon} />
                     <Text style={styles.buttonText}>Bid System</Text>
                 </TouchableOpacity>

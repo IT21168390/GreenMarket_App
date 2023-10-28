@@ -5,9 +5,15 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { getDatabase,  get, set, ref as databaseRef, update} from 'firebase/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BiddingSlider from './BiddingSlider';
-import { app } from '../../Firebase/FirebaseConfig';
+// <<<<<<< IT21168222
+// import { app } from '../../Firebase/firebaseConfig';
 
-const ItemDetailsScreen = ({ route }) => {
+// const ItemDetailsScreen = ({ route, navigation }) => {
+// =======
+// import { app } from '../../Firebase/FirebaseConfig';
+
+// const ItemDetailsScreen = ({ route }) => {
+// >>>>>>> main
     const { item } = route.params;
     const [userId, setUserId] = useState(null);
     const [bidPlacedTime, setBidPlacedTime] = useState(null);
@@ -118,9 +124,17 @@ const ItemDetailsScreen = ({ route }) => {
         const requestRef = databaseRef(database, `bids/${item.id}`);
       
         try {
-          await update(requestRef, lastBid);
-          console.log('Request updated successfully!');
-          // Refresh the requests list or perform other necessary actions
+// <<<<<<< IT21168222
+//           await update(requestRef, lastBid)
+//           console.log('Request updated successfully!');
+//           // Refresh the requests list or perform other necessary actions
+
+          
+// =======
+//           await update(requestRef, lastBid);
+//           console.log('Request updated successfully!');
+//           // Refresh the requests list or perform other necessary actions
+// >>>>>>> main
         } catch (error) {
           console.error('Error updating request:', error);
         }

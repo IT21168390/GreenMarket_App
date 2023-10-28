@@ -8,7 +8,11 @@ import * as FileSystem from 'expo-file-system';
 
 import { getDatabase, ref as databaseRef, push, get, set } from 'firebase/database';
 import { getDownloadURL, ref as storageRef } from 'firebase/storage';
-import { app } from '../../Firebase/FirebaseConfig';
+// <<<<<<< IT21168222
+// import { app } from '../../Firebase/firebaseConfig';
+// =======
+// import { app } from '../../Firebase/FirebaseConfig';
+// >>>>>>> main
 import { getStorage, uploadBytes } from "firebase/storage";
 
 import { KeyboardAvoidingView } from 'react-native';
@@ -230,11 +234,19 @@ export default function PostNewRequest() {
             bidData: 'Null'
         };
 
-        // Get a reference to the 'BarterRequests' database location
-        const barterRequestsRef = databaseRef(database, 'bids');
+// <<<<<<< IT21168222
+//         // Get a reference to the 'BidRequests' database location
+//         const bidRequestsRef = databaseRef(database, 'bids');
 
-        // Push the new request data to the database
-        push(barterRequestsRef)
+//         // Push the new request data to the database
+//         push(bidRequestsRef)
+// =======
+//         // Get a reference to the 'BarterRequests' database location
+//         const barterRequestsRef = databaseRef(database, 'bids');
+
+//         // Push the new request data to the database
+//         push(barterRequestsRef)
+// >>>>>>> main
             .then((newRequestRef) => {
                 // Now, set the data for the new request under the generated key
                 set(newRequestRef, newRequest)

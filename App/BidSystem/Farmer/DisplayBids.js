@@ -9,7 +9,11 @@ import * as FileSystem from 'expo-file-system';
 import { getDatabase, orderByChild, ref as databaseRef, push, get, set, remove, query, equalTo, child, update } from 'firebase/database';
 import { getDownloadURL, ref as storageRef, uploadString } from 'firebase/storage';
 import { getStorage, uploadBytes } from "firebase/storage";
-import { app, firebase } from '../../Firebase/FirebaseConfig';
+// <<<<<<< IT21168222
+// import { app, firebase } from '../../Firebase/firebaseConfig';
+// =======
+// import { app, firebase } from '../../Firebase/FirebaseConfig';
+// >>>>>>> main
 
 const units = ['kg', 'g', 'L', 'ml', 'units', 'other'];
 
@@ -51,12 +55,21 @@ const [selectedUnit, setSelectedUnit] = useState('');
 
 
 
-  const barterRef = databaseRef(database, `bids`);
+// <<<<<<< IT21168222
+//   const bidRef = databaseRef(database, `bids`);
 
-  function userBarterRequests() {
-    const barterQuery = query(barterRef, orderByChild('userId'), equalTo(userId));
+//   function userBidRequests() {
+//     const bidQuery = query(bidRef, orderByChild('userId'), equalTo(userId));
 
-    get(barterQuery)
+//     get(bidQuery)
+// =======
+//   const barterRef = databaseRef(database, `bids`);
+
+//   function userBarterRequests() {
+//     const barterQuery = query(barterRef, orderByChild('userId'), equalTo(userId));
+
+//     get(barterQuery)
+// >>>>>>> main
       .then((snapshot) => {
         if (snapshot.exists()) {
           // The data exists, and you can access it using snapshot.val()
@@ -89,7 +102,10 @@ const [selectedUnit, setSelectedUnit] = useState('');
             price: data[id].bidData.price,
           }));
           setRequests(requests);
+// <<<<<<< IT21168222
+// =======
           
+// >>>>>>> main
         } else {
           console.log("No data available");
         }
@@ -158,7 +174,11 @@ const [selectedUnit, setSelectedUnit] = useState('');
 
     }
 
-    userBarterRequests();
+// <<<<<<< IT21168222
+//     userBidRequests();
+// =======
+//     userBarterRequests();
+// >>>>>>> main
   };
 
 
@@ -190,7 +210,11 @@ const [selectedUnit, setSelectedUnit] = useState('');
   // Function to delete a specific item post
   const handleDeleteRequest = (itemId) => {
     // Create a reference to the item post in the database
-    const itemRef = child(barterRef, itemId);
+// <<<<<<< IT21168222
+//     const itemRef = child(bidRef, itemId);
+// =======
+//     const itemRef = child(barterRef, itemId);
+// >>>>>>> main
 
     // Use the 'remove' function to delete the item post
     remove(itemRef)
@@ -239,7 +263,11 @@ const [selectedUnit, setSelectedUnit] = useState('');
       fetchLoggedInUserID();
       if (userId !== null) {
         //loggedInUserData();
-        userBarterRequests();
+// <<<<<<< IT21168222
+//         userBidRequests();
+// =======
+//         userBarterRequests();
+// >>>>>>> main
       }
     }, [userId])
   );
@@ -499,7 +527,11 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   viewButton: {
-    backgroundColor: '#3AB918',
+// <<<<<<< IT21168222
+//     backgroundColor: '#e4eba4',
+// =======
+//     backgroundColor: '#3AB918',
+// >>>>>>> main
     //padding: 10,
     borderRadius: 5,
     //marginRight: 5,
@@ -770,7 +802,11 @@ const styles = StyleSheet.create({
     right: 0,
   },
   updateButton: {
-    backgroundColor: 'green',
+// <<<<<<< IT21168222
+//     backgroundColor: '#497db8',
+// =======
+//     backgroundColor: 'green',
+// >>>>>>> main
     padding: 8,
     borderRadius: 10,
     paddingLeft: 30,
@@ -778,7 +814,11 @@ const styles = StyleSheet.create({
     paddingRight: 30,
   },
   completeButton: {
-    backgroundColor: 'green',
+// <<<<<<< IT21168222
+//     backgroundColor: '#49adb8',
+// =======
+//     backgroundColor: 'green',
+// >>>>>>> main
     padding: 8,
     borderRadius: 10,
     paddingLeft: 30,
@@ -796,7 +836,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonTextView: {
-    color: '#fff',
+// <<<<<<< IT21168222
+//     color: '#000',
+// =======
+//     color: '#fff',
+// >>>>>>> main
     fontSize: 16,
     textAlign: 'center'
   },

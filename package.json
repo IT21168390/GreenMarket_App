@@ -30,7 +30,20 @@
     "react-native-screens": "~3.22.0",
     "react-native-tab-view": "^3.5.2",
     "expo-image-picker": "~14.3.2",
-    "expo-file-system": "~15.4.4"
+    "expo-file-system": "~15.4.4",
+
+    "@expo/webpack-config": "^19.0.0",
+    "@react-native-community/slider": "4.4.2",
+    "@react-native-firebase/app": "^18.5.0",
+    "@react-native-firebase/database": "^18.5.0",
+    "@react-native-firebase/storage": "^18.5.0",
+    "aws-sdk": "^2.1477.0",
+    "react-dom": "^18.2.0",
+    "react-native-gesture-handler": "~2.12.0",
+    "react-native-image-crop-picker": "^0.40.0",
+    "react-native-image-picker": "^7.0.1",
+    "react-native-reanimated": "~3.3.0",
+    "react-native-web": "^0.19.9"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
